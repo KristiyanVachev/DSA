@@ -1,6 +1,0 @@
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\OfficeSpace\bin\Debug\OfficeSpace.exe.config
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\OfficeSpace\bin\Debug\OfficeSpace.exe
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\OfficeSpace\bin\Debug\OfficeSpace.pdb
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\OfficeSpace\obj\Debug\OfficeSpace.csprojResolveAssemblyReference.cache
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\OfficeSpace\obj\Debug\OfficeSpace.exe
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\OfficeSpace\obj\Debug\OfficeSpace.pdb

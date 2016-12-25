@@ -1,6 +1,0 @@
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\UnitsOfWork\bin\Debug\UnitsOfWork.exe.config
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\UnitsOfWork\bin\Debug\UnitsOfWork.exe
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\UnitsOfWork\bin\Debug\UnitsOfWork.pdb
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\UnitsOfWork\obj\Debug\UnitsOfWork.exe
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\UnitsOfWork\obj\Debug\UnitsOfWork.pdb
-D:\Software Academy\09. Data Structures and Algorithms\Exam2015\Exam2015\UnitsOfWork\obj\Debug\UnitsOfWork.csprojResolveAssemblyReference.cache
