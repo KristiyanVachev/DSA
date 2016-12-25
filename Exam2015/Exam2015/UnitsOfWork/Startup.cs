@@ -22,15 +22,8 @@ namespace UnitsOfWork
                 switch (command[0])
                 {
                     case "add":
-                        if (!Contains(units, command[1]))
-                        {
-                            units.Add(new Unit { Name = command[1], Type = command[2], Attack = command[3] });
-                            finalResult.AppendLine("SUCCESS: " + command[1] + " added!");
-                        }
-                        else
-                        {
-                            finalResult.AppendLine("FAIL: " + command[1] + " already exists!");
-                        }
+                        string addResult = Add(units, command);
+                        finalResult.AppendLine(addResult);
                         break;
 
                     case "remove":
@@ -69,6 +62,30 @@ namespace UnitsOfWork
             Console.WriteLine(finalResult.ToString());
         }
 
+        static string Add(IList<Unit> units, string[] commands)
+        {
+            int index = Find(units, commands[1]);
+
+            if (index < 0)
+            {
+                return "FAIL: " + commands[1] + " already exists!";
+            }
+
+            var newUnit = new Unit { Name = commands[1], Type = commands[2], Attack = commands[3] };
+
+            if (index == units.Count)
+            {
+                units.Add(newUnit);
+            }
+
+            else
+            {
+                units.Insert(index, newUnit);
+            }
+
+            return "SUCCESS: " + commands[1] + " added!";
+        }
+
         static bool Contains(IList<Unit> units, string name)
         {
             foreach (var unit in units)
@@ -83,7 +100,7 @@ namespace UnitsOfWork
         }
 
         static void Add(IList<Unit> units, Unit unit)
-        {   
+        {
 
         }
 
@@ -119,43 +136,81 @@ namespace UnitsOfWork
             return "RESULT: " + string.Join(", ", formatedUnits);
         }
 
-        public static void Quicksort(IList<Unit> elements, Unit unit)
+        public static int Find(IList<Unit> elements, string name)
         {
+            if (elements.Count == 0)
+            {
+                return 0;
+            }
+
             int left = 0;
             int right = elements.Count - 1;
 
-            var pivot = elements[(left + right) / 2];
-
-            while (left < right)
+            while (right - left > 1)
             {
-                int n = string.Compare(pivot.Name, unit.Name, StringComparison.Ordinal);
-
-                if (n < 0)
+                if (right - left == 1)
                 {
-                    
+                    break;
                 }
-                else if (n > 0)
+
+                int middle = (left + right) / 2;
+                Unit pivot = elements[middle];
+
+                int bigger = string.Compare(name, pivot.Name, StringComparison.Ordinal);
+
+                if (bigger < 0)
                 {
-                    
+                    //less than
+                    right = middle;
+                }
+                else if (bigger > 0)
+                {
+                    //more
+                    left = middle;
                 }
                 else
                 {
-                    //0
+                    //already exists
+                    return -1;
                 }
             }
 
+            if (left == 0)
+            {
+                if (string.Compare(name, elements[0].Name, StringComparison.Ordinal) < 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+
+            if (right == elements.Count - 1)
+            {
+                if (string.Compare(name, elements[elements.Count - 1].Name, StringComparison.Ordinal) < 0)
+                {
+                    return elements.Count - 1;
+                }
+                else
+                {
+                    return elements.Count;
+                }
+            }
+
+            return left + 1;
         }
-
     }
-
-    internal class Unit
-    {
-        public string Name { get; set; }
-
-        public string Type { get; set; }
-
-        public string Attack { get; set; }
-    }
-
 
 }
+
+internal class Unit
+{
+    public string Name { get; set; }
+
+    public string Type { get; set; }
+
+    public string Attack { get; set; }
+}
+
