@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace UnitsOfWork
 {
@@ -12,9 +10,13 @@ namespace UnitsOfWork
         static void Main()
         {
             string currCommand = Console.ReadLine();
-            var units = new List<Unit>();
-            var finalResult = new StringBuilder();
+
+            var unitsByName = new Dictionary<string, Unit>();
             var unitsByAttack = new SortedSet<Unit>();
+            var unitsByType = new Dictionary<string, SortedSet<Unit>>();
+
+            var finalResult = new StringBuilder();
+
 
             while (!currCommand.Contains("end"))
             {
@@ -23,12 +25,12 @@ namespace UnitsOfWork
                 switch (command[0])
                 {
                     case "add":
-                        string addResult = Add(units, unitsByAttack, command);
+                        string addResult = Add(unitsByName, unitsByType, unitsByAttack, command);
                         finalResult.AppendLine(addResult);
                         break;
 
                     case "remove":
-                        if (Remove(units, command[1]))
+                        if (Remove(unitsByName, unitsByType, unitsByAttack, command[1]))
                         {
                             finalResult.AppendLine("SUCCESS: " + command[1] + " removed!");
                         }
@@ -39,20 +41,24 @@ namespace UnitsOfWork
                         break;
 
                     case "find":
-                        var selected =
-                            units.Where(x => x.Type == command[1])
-                                .OrderByDescending(x => x.Attack)
-                                .ThenBy(x => x.Name)
-                                .ToList();
 
-                        finalResult.AppendLine(Result(selected));
+                        if (!unitsByType.ContainsKey(command[1]))
+                        {
+                            finalResult.AppendLine("RESULT:");
+                        }
+                        else
+                        {
+                            var selected = unitsByType[command[1]].Take(10);
+                            finalResult.AppendLine(Output(selected));
+                        }
+
 
                         break;
 
                     case "power":
                         var top = unitsByAttack.Take(int.Parse(command[1]));
 
-                        finalResult.AppendLine(Result(top));
+                        finalResult.AppendLine(Output(top));
 
                         break;
                 }
@@ -63,65 +69,49 @@ namespace UnitsOfWork
             Console.WriteLine(finalResult.ToString());
         }
 
-        static string Add(IList<Unit> units, SortedSet<Unit> unitsByAttack, string[] commands)
+        static string Add(IDictionary<string, Unit> unitsByName, IDictionary<string, SortedSet<Unit>> unitsByType, SortedSet<Unit> unitsByAttack, string[] commands)
         {
-            int index = Find(units, commands[1]);
-
-            if (index < 0)
+            if (unitsByName.ContainsKey(commands[1]))
             {
                 return "FAIL: " + commands[1] + " already exists!";
             }
 
             var newUnit = new Unit { Name = commands[1], Type = commands[2], Attack = commands[3] };
 
-            if (index == units.Count)
+            unitsByName[commands[1]] = newUnit;
+
+            if (!unitsByType.ContainsKey(commands[2]))
             {
-                units.Add(newUnit);
+                unitsByType[commands[2]] = new SortedSet<Unit>();
             }
 
-            else
-            {
-                units.Insert(index, newUnit);
-            }
+            unitsByType[commands[2]].Add(newUnit);
 
             unitsByAttack.Add(newUnit);
 
             return "SUCCESS: " + commands[1] + " added!";
         }
-
-        static bool Contains(IList<Unit> units, string name)
+       
+        static bool Remove(IDictionary<string, Unit> unitsByName, IDictionary<string, SortedSet<Unit>> unitsByType, SortedSet<Unit> unitsByAttack, string name)
         {
-            foreach (var unit in units)
+            if (!unitsByName.ContainsKey(name))
             {
-                if (unit.Name == name)
-                {
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            var unitToRemove = unitsByName[name];
+
+            unitsByName.Remove(name);
+
+            unitsByType[unitToRemove.Type].Remove(unitToRemove);
+
+            unitsByAttack.Remove(unitToRemove);
+
+            return true;
+
         }
 
-        static void Add(IList<Unit> units, Unit unit)
-        {
-
-        }
-
-        static bool Remove(IList<Unit> units, string name)
-        {
-            for (int i = 0; i < units.Count; i++)
-            {
-                if (units[i].Name == name)
-                {
-                    units.RemoveAt(i);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        static string Result(IEnumerable<Unit> selected)
+        static string Output(IEnumerable<Unit> selected)
         {
             var formatedUnits = new List<string>();
 
@@ -137,72 +127,6 @@ namespace UnitsOfWork
             }
 
             return "RESULT: " + string.Join(", ", formatedUnits);
-        }
-
-        public static int Find(IList<Unit> elements, string name)
-        {
-            if (elements.Count == 0)
-            {
-                return 0;
-            }
-
-            int left = 0;
-            int right = elements.Count - 1;
-
-            while (right - left > 1)
-            {
-                if (right - left == 1)
-                {
-                    break;
-                }
-
-                int middle = (left + right) / 2;
-                Unit pivot = elements[middle];
-
-                int bigger = string.Compare(name, pivot.Name, StringComparison.Ordinal);
-
-                if (bigger < 0)
-                {
-                    //less than
-                    right = middle;
-                }
-                else if (bigger > 0)
-                {
-                    //more
-                    left = middle;
-                }
-                else
-                {
-                    //already exists
-                    return -1;
-                }
-            }
-
-            if (left == 0)
-            {
-                if (string.Compare(name, elements[0].Name, StringComparison.Ordinal) < 0)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
-
-            if (right == elements.Count - 1)
-            {
-                if (string.Compare(name, elements[elements.Count - 1].Name, StringComparison.Ordinal) < 0)
-                {
-                    return elements.Count - 1;
-                }
-                else
-                {
-                    return elements.Count;
-                }
-            }
-
-            return left + 1;
         }
     }
 
@@ -227,4 +151,3 @@ internal class Unit : IComparable<Unit>
         return result;
     }
 }
-
