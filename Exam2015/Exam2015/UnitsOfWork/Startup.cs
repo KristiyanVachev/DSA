@@ -12,8 +12,9 @@ namespace UnitsOfWork
         static void Main()
         {
             string currCommand = Console.ReadLine();
-            List<Unit> units = new List<Unit>();
+            var units = new List<Unit>();
             var finalResult = new StringBuilder();
+            var unitsByAttack = new SortedSet<Unit>();
 
             while (!currCommand.Contains("end"))
             {
@@ -22,7 +23,7 @@ namespace UnitsOfWork
                 switch (command[0])
                 {
                     case "add":
-                        string addResult = Add(units, command);
+                        string addResult = Add(units, unitsByAttack, command);
                         finalResult.AppendLine(addResult);
                         break;
 
@@ -49,7 +50,7 @@ namespace UnitsOfWork
                         break;
 
                     case "power":
-                        var top = units.OrderByDescending(x => x.Attack).Take(int.Parse(command[1])).ToList();
+                        var top = unitsByAttack.Take(int.Parse(command[1]));
 
                         finalResult.AppendLine(Result(top));
 
@@ -62,7 +63,7 @@ namespace UnitsOfWork
             Console.WriteLine(finalResult.ToString());
         }
 
-        static string Add(IList<Unit> units, string[] commands)
+        static string Add(IList<Unit> units, SortedSet<Unit> unitsByAttack, string[] commands)
         {
             int index = Find(units, commands[1]);
 
@@ -82,6 +83,8 @@ namespace UnitsOfWork
             {
                 units.Insert(index, newUnit);
             }
+
+            unitsByAttack.Add(newUnit);
 
             return "SUCCESS: " + commands[1] + " added!";
         }
@@ -118,7 +121,7 @@ namespace UnitsOfWork
             return false;
         }
 
-        static string Result(IList<Unit> selected)
+        static string Result(IEnumerable<Unit> selected)
         {
             var formatedUnits = new List<string>();
 
@@ -205,12 +208,23 @@ namespace UnitsOfWork
 
 }
 
-internal class Unit
+internal class Unit : IComparable<Unit>
 {
     public string Name { get; set; }
 
     public string Type { get; set; }
 
     public string Attack { get; set; }
+
+    public int CompareTo(Unit other)
+    {
+        var result = this.Attack.CompareTo(other.Attack) * -1;
+        if (result == 0)
+        {
+            result = this.Name.CompareTo(other.Name);
+        }
+
+        return result;
+    }
 }
 
